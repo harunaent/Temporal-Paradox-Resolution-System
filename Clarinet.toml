@@ -1,0 +1,29 @@
+[project]
+name = 'Temporal-Paradox-Resolution-System'
+description = ''
+authors = []
+telemetry = true
+cache_dir = './.cache'
+requirements = []
+[contracts.computation-token]
+path = 'contracts/computation-token.clar'
+clarity_version = 2
+epoch = 2.5
+
+[contracts.paradox-nft]
+path = 'contracts/paradox-nft.clar'
+clarity_version = 2
+epoch = 2.5
+
+[contracts.paradox-scenarios]
+path = 'contracts/paradox-scenarios.clar'
+clarity_version = 2
+epoch = 2.5
+[repl.analysis]
+passes = ['check_checker']
+
+[repl.analysis.check_checker]
+strict = false
+trusted_sender = false
+trusted_caller = false
+callee_filter = false
