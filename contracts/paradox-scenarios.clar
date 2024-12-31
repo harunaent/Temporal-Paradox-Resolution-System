@@ -1,35 +1,52 @@
-;; Paradox NFT Contract
+;; Temporal Paradox Scenarios Contract
 
-(define-non-fungible-token paradox-nft uint)
+(define-data-var last-scenario-id uint u0)
 
-(define-data-var last-token-id uint u0)
+(define-map paradox-scenarios
+  { scenario-id: uint }
+  {
+    creator: principal,
+    title: (string-ascii 100),
+    description: (string-utf8 1000),
+    parameters: (list 10 (string-ascii 50)),
+    status: (string-ascii 20)
+  }
+)
 
-(define-map token-uris { token-id: uint } { uri: (string-utf8 256) })
-
-(define-public (mint (recipient principal) (uri (string-utf8 256)))
+(define-public (create-paradox-scenario (title (string-ascii 100)) (description (string-utf8 1000)) (parameters (list 10 (string-ascii 50))))
   (let
     (
-      (token-id (+ (var-get last-token-id) u1))
+      (new-id (+ (var-get last-scenario-id) u1))
     )
-    (try! (nft-mint? paradox-nft token-id recipient))
-    (map-set token-uris { token-id: token-id } { uri: uri })
-    (var-set last-token-id token-id)
-    (ok token-id)
+    (map-set paradox-scenarios
+      { scenario-id: new-id }
+      {
+        creator: tx-sender,
+        title: title,
+        description: description,
+        parameters: parameters,
+        status: "open"
+      }
+    )
+    (var-set last-scenario-id new-id)
+    (ok new-id)
   )
 )
 
-(define-public (transfer (token-id uint) (sender principal) (recipient principal))
-  (begin
-    (asserts! (is-eq tx-sender sender) (err u403))
-    (nft-transfer? paradox-nft token-id sender recipient)
+(define-public (submit-resolution-attempt (scenario-id uint) (resolution-description (string-utf8 1000)))
+  (let
+    (
+      (scenario (unwrap! (map-get? paradox-scenarios { scenario-id: scenario-id }) (err u404)))
+    )
+    (asserts! (is-eq (get status scenario) "open") (err u403))
+    (ok (map-set paradox-scenarios
+      { scenario-id: scenario-id }
+      (merge scenario { status: "resolution-submitted" })
+    ))
   )
 )
 
-(define-read-only (get-token-uri (token-id uint))
-  (ok (get uri (unwrap! (map-get? token-uris { token-id: token-id }) (err u404))))
-)
-
-(define-read-only (get-owner (token-id uint))
-  (ok (nft-get-owner? paradox-nft token-id))
+(define-read-only (get-paradox-scenario (scenario-id uint))
+  (ok (map-get? paradox-scenarios { scenario-id: scenario-id }))
 )
 

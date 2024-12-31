@@ -10,6 +10,16 @@ path = 'contracts/computation-token.clar'
 clarity_version = 2
 epoch = 2.5
 
+[contracts.paradox-nft]
+path = 'contracts/paradox-nft.clar'
+clarity_version = 2
+epoch = 2.5
+
+[contracts.paradox-nft_]
+path = 'contracts/paradox-nft_.clar'
+clarity_version = 2
+epoch = 2.5
+
 [contracts.paradox-scenarios]
 path = 'contracts/paradox-scenarios.clar'
 clarity_version = 2
